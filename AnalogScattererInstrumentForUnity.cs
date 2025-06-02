@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public class AnalogScattererInstrumentForUnity : MonoBehaviour
 {
-    // Определение пула источников аудио, микшера и бас-шины.
+    // Define the pool of audio sources, mixer, and bus.
     [Header("AudioClips Settings")]
     [SerializeField] private AudioClip[] audioClips;
     [SerializeField] private int poolSize = 10;
@@ -13,7 +13,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
     [SerializeField] private AudioMixerGroup audioGroup;
     [Range(0, 500)] [SerializeField] private int SpawnRate = 100;
 
-    // Определяем диапазон задержки воспроизведения аудиклипов и диапазон рандомизации громкости и частоты.
+    // Define the range for playback delay and randomization of volume and pitch.
     [Header("Audio Settings")]
     [Range(0.1f, 300)] [SerializeField] private float minDelay = 5f;
     [Range(0.1f, 300)] [SerializeField] private float maxDelay = 20f;
@@ -22,8 +22,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
     [Range(0.99f, 1.01f)] [SerializeField] private float minPitch = 0.995f;
     [Range(0.99f, 1.01f)] [SerializeField] private float maxPitch = 1.005f;
 
-    // Определяем диапазон расстояний, в пределах которого будет происходить случайный разброс (scatter) аудиоисточников вокруг текущей позиции объекта и
-    //тип кривой аттенюации.
+    // Define the distance range for random scattering of audio sources around the object's position and the attenuation curve type.
     [Header("Spatial Settings")]
     [SerializeField] private bool enable3D = true;
     [Range(0, 500)] [SerializeField] private float minScatterDistance = 20f;
@@ -34,17 +33,16 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
 
 
 
-    //Определение массива клипов,который будет использоваться для воспроизведения.
+    // Define the array of clips to be used for playback.
     private List<AudioSource> audioSourcesPool = new List<AudioSource>();
-    private int lastClipIndex = -1; // Индекс последнего воспроизведенного аудиоклипа для предотвращения повтора одного и того же клипа подряд.
+    private int lastClipIndex = -1; // Index of the last played audio clip to prevent consecutive repeats.
 
-
-    //Создаем переменную, которая хранит ссылку на корутину, которая используется для управления воспроизведением звуков с задержкой.
-    //Корутина управляет временными интервалами между воспроизведениями.
+    // Create a variable to store the coroutine used for managing audio playback with delays.
+    // The coroutine controls the time intervals between playbacks.
     private Coroutine playAudioCoroutine;
 
-    //Инициализация аудиосорсов, проверка на корректность аудиоклипов и задержек, а также запуск корутины для воспроизведения клипов с задержкой.
-    //Проверка валидности аудиоклипов и задержек перед началом воспроизведения.
+    // Initialize audio sources, validate audio clips and delays, and start the coroutine for delayed clip playback.
+    // Validate audio clips and delays before starting playback.
     void Start()
     {
         ValidateAudioSource();
@@ -56,8 +54,8 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         playAudioCoroutine = StartCoroutine(PlayAudioClipsWithDelay());
     }
 
-    //Метод для получения случайного индекса аудиоклипа, отличного от предыдущего воспроизведенного,
-    //если количество клипов меньше двух, метод возвращает 0, чтобы избежать бесконечного цикла.
+    // Method to get a random audio clip index different from the previously played one.
+    // Returns 0 if the number of clips is less than two to avoid an infinite loop.
     private int GetRandomIndex(int clipLength)
     {
         if (clipLength <= 1) return 0;
@@ -73,7 +71,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
 
 
 
-    //Метод инициализации пула аудиосорсов,источники добавляются в пул по мере необходимости.
+    // Method to initialize the audio source pool, adding sources as needed.
     private void InitializeAudioSources(int numberOfSources)
     {
         for (int i = 0; i < numberOfSources; i++)
@@ -86,7 +84,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
     }
 
 
-    //Метод проверки на наличие компонента AudioSourse
+    // Method to check for the presence of an AudioSource component.
     private void ValidateAudioSource()
     {
 
@@ -98,7 +96,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         }
 
     }
-    //Метод для проверки наличия аудиоклипов.
+    // Method to validate the presence of audio clips.
     private bool ValidateAudioClips()
     {
         if (audioClips == null || audioClips.Length == 0)
@@ -108,7 +106,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         }
         return true;
     }
-    //Метод проверки корректности значений задержки.
+    // Method to validate delay values.
     private bool ValidateDelayValues()
     {
         if (minDelay > maxDelay)
@@ -118,7 +116,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         }
         return true;
     }
-    // Метод проверки корректности значений дистанции разброса.
+   // Method to validate scatter distance values.
     private bool ValidateDistanceValue()
     {
         if(minScatterDistance > maxScatterDistance)
@@ -129,7 +127,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         return true;
     }
     
-    //Функция для создания нового аудиосорса.
+    // Function to create a new audio source.
     private AudioSource CreateNewAudioSource()
     {
         GameObject newSourceObject = new GameObject("AudioSource_" + audioSourcesPool.Count);
@@ -141,14 +139,14 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         newSource.dopplerLevel = dopplerLevel;
         newSource.playOnAwake = false;
         newSource.rolloffMode = audioRolloff;
-        newSource.maxDistance = maxScatterDistance; // используется для установки расстояния, на котором звук полностью затухает.
+        newSource.maxDistance = maxScatterDistance; 
 
 
         return newSource;
     }
 
-    //Метод для получения доступного аудиосорса из пула. Если все источники заняты и их количество меньше poolSize, создается новый источник.
-    //Если все источники заняты и достигнуто максимальное количество, возвращается первый источник из пула.
+    // Method to get an available audio source from the pool. If all sources are busy and the pool size is not exceeded, a new source is created.
+    // If all sources are busy and the maximum pool size is reached, the first source in the pool is returned.
     private AudioSource GetAvailableAudioSource()
     {
         foreach (AudioSource source in audioSourcesPool)
@@ -166,8 +164,8 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         return audioSourcesPool[0];
     }
 
-    //Метод для получения случайной позиции в заданном диапазоне расстояний от текущей позиции объекта.
-    //Создает эффект случайного разброса источников звука в 3D-пространстве.
+    // Method to get a random position within the specified distance range from the object's position.
+    // Creates a random scattering effect for audio sources in 3D space.
     private Vector3 GetRandomPosition(float minDistance, float maxDistance)
     {
         Vector3 randomDirection = Random.onUnitSphere;
@@ -176,7 +174,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
     }
 
     
-    //Корутина для плавного перемещения аудиосорса к целевой позиции."float duration" контролирует время перемещения, позиция источника изменяется каждый кадр.
+    // Coroutine for smoothly moving an audio source to a target position. "float duration" controls the movement duration, updating the source position each frame.
     private IEnumerator MoveAudioSourceSmoothly(AudioSource source, Vector3 targetPosition, float duration)
     {
 
@@ -202,31 +200,31 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
 
   
 
-    // Корутина для удаления аудиосорса из пула после того, как клип завершил воспроизведение. Он проверяет, завершился ли клип, и удаляет источник только после этого.
+    // Coroutine to remove an audio source from the pool after the clip finishes playing. It checks if the clip has ended and removes the source only after completion.
     private IEnumerator DestroyAudioSourceAfterClip(AudioSource source)
     {
         if (source != null && source.clip != null)
         {
             float clipLength = source.clip.length;
 
-            // Использовать флаг для отслеживания завершения клипа
+            // Use a flag to track clip completion.
             bool clipEnded = false;
 
-            // Проверить, завершился ли клип
+            // Check if the clip has finished.
             while (clipLength > 0)
             {
-                yield return null; // Ожидание одного кадра
-                clipLength -= Time.deltaTime; // Уменьшить оставшееся продолжительность клипа
+                yield return null; // Wait for one frame.
+                clipLength -= Time.deltaTime; // Decrease the remaining clip duration.
                 if (clipLength <= 0)
                 {
                     clipEnded = true;
                 }
             }
 
-            // Подождать небольшую задержку после завершения
+            // Wait for a short delay after completion.
             yield return new WaitForSeconds(0.1f);
 
-            // Проверить, что аудиосорс не был изменен и клип действительно завершился
+            // Ensure the audio source hasn't been modified and the clip has truly ended.
             if (source != null && !source.isPlaying && clipEnded)
             {
                 source.Stop();
@@ -237,7 +235,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         }
     }
 
-    // Метод,  который определяет, сколько раз аудиоклип должен воспроизвестись на основе заданной вероятности (SpawnRate).
+    // Method to determine how many times an audio clip should play based on the specified probability (SpawnRate).
     private void PlayAudioSourceMultipleTimes(float probability)
     {
         
@@ -249,7 +247,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         
         for (int i = 0; i < maxRepetitions; i++)
         {
-            float effectiveProbability = Mathf.Max(probabilityNormalized - i, 0f); // Убеждаемся, что вероятность не отрицательна
+            float effectiveProbability = Mathf.Max(probabilityNormalized - i, 0f); // Ensure probability is not negative.
             
             float randomValue = Random.value;
 
@@ -261,7 +259,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
     }
 
 
-    //Метод отвечает за настройку аудиосорса (позиция, громкость, высота звука) и воспроизведение клипа.
+    // Method to configure the audio source (position, volume, pitch) and play the clip.
     private void PlayAudioClip()
     {
         Vector3 previousPosition = transform.position;
@@ -274,7 +272,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
 
             if (Vector3.Distance(previousPosition, newStartPosition) > maxScatterDistance / 2)
             {
-                StartCoroutine(MoveAudioSourceSmoothly(source, newStartPosition, 10f)); // 10f выбрано как оптимальное решение между скоростью перемещения и естественностью звучания.
+                StartCoroutine(MoveAudioSourceSmoothly(source, newStartPosition, 10f)); // 10f is chosen as an optimal balance between movement speed and natural sound.
             }
             else
             {
@@ -296,7 +294,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         Debug.Log($"Playing clip: {source.clip.name} from position: {source.transform.position}");
     }
 
-    // Корутина отвечает за воспроизведение с случайными временными интервалами между запусками.
+     // Coroutine to handle playback with random time intervals between plays.
     private IEnumerator PlayAudioClipsWithDelay()
     {
         
@@ -310,7 +308,7 @@ public class AnalogScattererInstrumentForUnity : MonoBehaviour
         }
     }
 
-    //Метод останавливает текущую корутину воспроизведения, а также все источники в пуле. Все корутины в объекте также останавливаются.
+   // Method to stop the current playback coroutine and all sources in the pool. All coroutines in the object are also stopped.
     public void StopPlaying()
     {
         if (playAudioCoroutine != null)
